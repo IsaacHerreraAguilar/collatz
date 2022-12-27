@@ -10,6 +10,7 @@ import { GraphContainerComponent } from './components/graph-container/graph-cont
 import { HomeComponent } from './pages/home/home.component';
 import { HistoryComponent } from './pages/history/history.component';
 import { FormsModule } from '@angular/forms';
+import { HighchartsChartModule } from 'highcharts-angular';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { FormsModule } from '@angular/forms';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
+    HighchartsChartModule
   ],
   providers: [],
   bootstrap: [AppComponent]
