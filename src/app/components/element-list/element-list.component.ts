@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-element-list',
@@ -7,4 +7,11 @@ import { Component } from '@angular/core';
 })
 export class ElementListComponent {
 
+  @Input() seriesList: number[] = [];
+
+  @Output() removedId: EventEmitter<number> = new EventEmitter<number>();
+
+  deleteSignal(id: number) {
+    this.removedId.emit(id);
+  }
 }

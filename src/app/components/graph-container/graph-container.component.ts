@@ -1,4 +1,4 @@
-import { Component, Input, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import { Options } from 'highcharts';
 
@@ -12,21 +12,21 @@ export class GraphContainerComponent {
 
   @Input() newValue: number = 0;
 
+  @Input() deletedSerie: number = 0;
+
+  @Output() outputList: EventEmitter<number[]> = new EventEmitter<number[]>();
+
+  seriesId: number[] = [];
+
   collatzValue: number = 0;
 
   cicle = false;
 
-  message: string = '';
-
   collatzSerie: number[] = [];
-
-  collatzNumbers: any[] = [];
 
   Highcharts = Highcharts;
 
-  aaa: number[] = [5,6,7,8,9,10];
-
-  bbb: number[] = [1,2,3,4];
+  counter: number = 1;
 
   chartRef: any;
   updateFlag: any;
@@ -89,44 +89,55 @@ export class GraphContainerComponent {
 
   ngOnChanges(changes: SimpleChanges) {
 
-    if(changes['newValue'].previousValue != undefined){
+    if(typeof changes['newValue'] != 'undefined'){
+      if(changes['newValue'].previousValue != undefined){
 
-      if(changes['newValue'].currentValue != changes['newValue'].previousValue){
-
-        this.message += 'Collatz ' + this.newValue + ': ';
-        this.collatzValue = this.newValue;
-        this.cicle = false;
-        this.collatz();
+        if(changes['newValue'].currentValue != changes['newValue'].previousValue){
+  
+          this.collatzValue = this.newValue;
+  
+          if(this.collatzValue != 4){
+            this.cicle = false;
+          } else {
+            this.cicle = true;
+          }
+          
+          this.collatz();
+        }
       }
     }
+
+    if(typeof changes['deletedSerie'] != 'undefined'){
+      if(changes['deletedSerie'].previousValue != undefined){
+        if(changes['deletedSerie'].currentValue != changes['deletedSerie'].previousValue){
+          this.removeSerie(this.deletedSerie);
+        }
+      }
+    }
+
   }
 
   collatz() {
+
+    this.collatzSerie.push(this.collatzValue);
 
     if(this.collatzValue % 2 == 0){
       this.collatzValue = this.collatzValue / 2;
       if(this.collatzValue == 4 && this.cicle){
         this.genGraph();
-        // console.log(this.message);
-        // this.message = '';
         return;
       } else if(this.collatzValue == 4){
         this.cicle = true;
       }
-      this.collatzSerie.push(this.collatzValue);
-      // this.message += this.collatzValue + ', ';
       this.collatz();
     } else {
       this.collatzValue = this.collatzValue * 3 + 1;
       if(this.collatzValue == 4 && this.cicle){
         this.genGraph();
-        // console.log(this.message);
         return;
       } else if(this.collatzValue == 4){
         this.cicle = true;
       }
-      this.collatzSerie.push(this.collatzValue);
-      // this.message += this.collatzValue + ', ';
       this.collatz();
     }
   }
@@ -152,10 +163,22 @@ export class GraphContainerComponent {
     // });
 
     this.chartRef.addSeries({
+      id: `${this.counter}`,
       type: 'line',
       data: this.collatzSerie
     });
 
+    this.seriesId.push(this.counter);
+    this.outputList.emit(this.seriesId);
+
     this.collatzSerie = [];
+
+    this.counter++;
+  }
+
+  removeSerie(deletedSerie: number){
+    this.chartRef.get(`${deletedSerie}`).remove();
+
+    document.getElementById(`${deletedSerie}`)?.remove();
   }
 }

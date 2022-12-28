@@ -5,16 +5,29 @@ import { Component, EventEmitter, Output } from '@angular/core';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
+
 export class HomeComponent {
 
   correctNumber: number = 0;
 
-  receiveValue(value: string): void {
+  collatzList: number[] = [];
+
+  homeDeletedSerie: number = 0;
+
+  receiveValue(value: string) {
     let tempValue = Number(value);
     if(tempValue <= 0){
       alert('Asegurese de insertar un número entero positivo');
     } else {
       this.correctNumber = Number(value);
     }
+  }
+
+  receiveList(value: number[]) {
+    this.collatzList = value;
+  }
+
+  receiveId(value: number) {
+    this.homeDeletedSerie = value;
   }
 }

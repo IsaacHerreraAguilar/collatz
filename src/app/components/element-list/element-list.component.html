@@ -1,1 +1,6 @@
-<p>element-list works!</p>
+<div *ngFor="let item of seriesList">
+    <div id="{{item}}">
+        <p>{{item}}</p>
+        <button type="button" (click)="deleteSignal(item)">Eliminar serie</button>
+    </div>
+</div>
