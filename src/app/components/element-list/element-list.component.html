@@ -1,6 +1,5 @@
 <div *ngFor="let item of seriesList">
     <div id="{{item}}">
-        <p>{{item}}</p>
-        <button type="button" (click)="deleteSignal(item)">Eliminar serie</button>
+        <app-active-element [element]="item" (removedId)="deleteSignalFather($event)"></app-active-element>
     </div>
 </div>

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import { Options } from 'highcharts';
+import { HistoryService } from 'src/app/services/history.service';
 
 @Component({
   selector: 'app-graph-container',
@@ -70,12 +71,14 @@ export class GraphContainerComponent {
       text: 'GRAFICO BLABLA'
     },
     series: [
-      {
-        type: 'line',
-        data: [1,2,3]
-      }
+      // {
+      //   type: 'line',
+      //   data: [1,2,3]
+      // }
     ]
   };
+
+  constructor(private historyService: HistoryService) { }
 
   chartCallback: Highcharts.ChartCallbackFunction = chart => {
     this.chartRef = chart;
@@ -165,11 +168,14 @@ export class GraphContainerComponent {
     this.chartRef.addSeries({
       id: `${this.counter}`,
       type: 'line',
-      data: this.collatzSerie
+      data: this.collatzSerie,
+      name: `#${this.counter}: ${this.collatzSerie[0]}`
     });
 
     this.seriesId.push(this.counter);
     this.outputList.emit(this.seriesId);
+
+    this.historyService.addSerie(this.collatzSerie);
 
     this.collatzSerie = [];
 

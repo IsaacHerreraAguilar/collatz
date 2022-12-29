@@ -11,7 +11,7 @@ export class ElementListComponent {
 
   @Output() removedId: EventEmitter<number> = new EventEmitter<number>();
 
-  deleteSignal(id: number) {
+  deleteSignalFather(id: number) {
     this.removedId.emit(id);
   }
 }

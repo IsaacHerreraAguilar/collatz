@@ -1,1 +1,20 @@
-<p>history works!</p>
+<h1>Historial</h1>
+
+<div class="accordion" id="accordionHistory">
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button text-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHistory" aria-expanded="true" aria-controls="collapseHistory">
+                Historial
+            </button>
+        </h2>
+        <div id="collapseHistory" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionHistory">
+            <div class="accordion-body">
+                <div *ngFor="let serie of collatzList; let i = index">
+                    <h3 [ngClass]="{ 'color': i == greatestSerie }" *ngIf="i > 0">{{i}}: {{serie}}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button id="homeButton" class="btn btn-lg btn-info" routerLink="/home">Regresar a graficador</button>
