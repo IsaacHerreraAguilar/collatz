@@ -1,3 +1,7 @@
 .color {
     color: red;
 }
+
+#accordionHistory {
+    word-wrap: break-word;
+}

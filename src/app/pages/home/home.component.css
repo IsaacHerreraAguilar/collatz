@@ -1,0 +1,25 @@
+#historyButton {
+    margin-top: 0.5%;
+}
+
+.container {
+    margin: 2%;
+    padding: 2%;
+}
+
+.series-col {
+    border-width: 5px;
+    border-color: black;
+    border-style: groove;
+    max-height: 40rem;
+    overflow-y: scroll;
+}
+
+p {
+    font-weight: 600;
+    font-size: large;
+}
+
+label { 
+    font-weight: 600;
+}

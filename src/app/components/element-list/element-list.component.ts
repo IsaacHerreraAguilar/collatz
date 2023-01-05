@@ -5,6 +5,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   templateUrl: './element-list.component.html',
   styleUrls: ['./element-list.component.css']
 })
+
 export class ElementListComponent {
 
   @Input() seriesList: number[] = [];

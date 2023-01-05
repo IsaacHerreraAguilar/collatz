@@ -1,8 +1,41 @@
 <h1>Graficador conjetura de Collatz</h1>
-<h2>Isaac Herrera</h2>
 
-<app-graph-container [newValue]="correctNumber" [deletedSerie]="homeDeletedSerie" (outputList)="receiveList($event)"></app-graph-container>
+<!-- <app-graph-container [newValue]="correctNumber" [deletedSerie]="homeDeletedSerie" (outputList)="receiveList($event)"></app-graph-container>
 <app-element-input (outputValue)="receiveValue($event)"></app-element-input>
 <app-element-list [seriesList]="collatzList" (removedId)="receiveId($event)"></app-element-list>
 
-<button id="historyButton" class="btn btn-lg btn-info" routerLink="/history">Historial</button>
+<button id="historyButton" class="btn btn-lg btn-info" routerLink="/history">Historial</button> -->
+
+<div class="container text-center">
+    <div class="row">
+        <div class="col-2 series-col">
+            <p>Series Activas</p>
+            <app-element-list [seriesList]="collatzList" (removedId)="receiveId($event)"></app-element-list>
+        </div>
+        <div class="col-10">
+            <app-graph-container [newValue]="correctNumber" [deletedSerie]="homeDeletedSerie" (outputList)="receiveList($event)"></app-graph-container>
+            <div class="inputBox">
+                <label for="element-input">Insertar nueva serie</label>
+                <app-element-input id="element-input" (outputValue)="receiveValue($event)"></app-element-input>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <div class="grid">
+    <div class="g-col-6">
+        <p>Series Activas</p>
+        <app-element-list [seriesList]="collatzList" (removedId)="receiveId($event)"></app-element-list>
+    </div>
+    <div class="g-col-6">
+        <app-graph-container [newValue]="correctNumber" [deletedSerie]="homeDeletedSerie" (outputList)="receiveList($event)"></app-graph-container>
+        <div class="inputBox">
+            <label for="element-input">Insertar nueva serie</label>
+            <app-element-input id="element-input" (outputValue)="receiveValue($event)"></app-element-input>
+        </div>
+    </div>
+</div> -->
+
+<div class="d-grid gap-2 col-3 mx-auto">
+    <button id="historyButton" class="btn btn-lg btn-info" routerLink="/history">Historial</button>
+</div>
