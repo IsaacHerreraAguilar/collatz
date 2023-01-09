@@ -8,10 +8,12 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 export class ActiveElementComponent {
 
+  // Entrada con el Id del elemento
   @Input() element: number = 0;
 
   @Output() removedId: EventEmitter<number> = new EventEmitter<number>();
 
+  // Envia señal al padre (element list) de su Id para que sea eliminado
   deleteSignalChild(id: number) {
     this.removedId.emit(id);
   }

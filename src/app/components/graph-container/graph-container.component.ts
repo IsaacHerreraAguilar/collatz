@@ -11,22 +11,29 @@ import { HistoryService } from 'src/app/services/history.service';
 
 export class GraphContainerComponent {
 
+  // Entrada con el nuevo valor a graficar
   @Input() newValue: number = 0;
 
+  // Entrada del Id de la serie a borrar
   @Input() deletedSerie: number = 0;
 
+  // Salida de la lista de IDs de las series para el home
   @Output() outputList: EventEmitter<number[]> = new EventEmitter<number[]>();
 
+  // Lista con los id de las series
   seriesId: number[] = [];
 
+  // Número actual para aplicar conjetura
   collatzValue: number = 0;
 
   cicle = false;
 
+  // Serie del número actual
   collatzSerie: number[] = [];
 
   Highcharts = Highcharts;
 
+  // Control de los Id de las series
   counter: number = 1;
 
   chartRef: any;
@@ -54,7 +61,7 @@ export class GraphContainerComponent {
   //     type: 'line'
   //   },
   //   title: {
-  //     text: 'GRAFICO BLABLA'
+  //     text: 'GRAFICO'
   //   },
   //   series: [{
   //     name: 'linea1',
@@ -63,23 +70,21 @@ export class GraphContainerComponent {
   //   }]
   // });
 
+  // Creación del graficador vacío
   chartW: Options = {
     chart: {
       type: 'line'
     },
     title: {
-      text: 'GRAFICO BLABLA'
+      text: 'Pasos de la serie de Collatz de un número para llegar a 1 e iniciar un ciclo'
     },
     series: [
-      // {
-      //   type: 'line',
-      //   data: [1,2,3]
-      // }
     ]
   };
 
   constructor(private historyService: HistoryService) { }
 
+  // Asignación del graficador a una referencia (necesario para actualizarlo visualmente)
   chartCallback: Highcharts.ChartCallbackFunction = chart => {
     this.chartRef = chart;
   };
@@ -92,6 +97,7 @@ export class GraphContainerComponent {
 
   ngOnChanges(changes: SimpleChanges) {
 
+    // Verifica si el valor newValue cambió para así iniciar un nuevo calculo
     if(typeof changes['newValue'] != 'undefined'){
       if(changes['newValue'].previousValue != undefined){
 
@@ -110,6 +116,7 @@ export class GraphContainerComponent {
       }
     }
 
+    // Verifica si el valor deletedSerie cambió para borrar la serie correspondiente
     if(typeof changes['deletedSerie'] != 'undefined'){
       if(changes['deletedSerie'].previousValue != undefined){
         if(changes['deletedSerie'].currentValue != changes['deletedSerie'].previousValue){
@@ -120,6 +127,7 @@ export class GraphContainerComponent {
 
   }
 
+  // Lógica de la conjetura de Collatz
   collatz() {
 
     this.collatzSerie.push(this.collatzValue);
@@ -145,25 +153,8 @@ export class GraphContainerComponent {
     }
   }
 
+  // Añade una nueva serie al graficador
   genGraph() {
-    // this.linechart = {
-    //   series: [
-    //     {
-    //       data: this.collatzSerie,
-    //     },
-    //   ],
-    //   chart: {
-    //     type: 'line',
-    //   },
-    //   title: {
-    //     text: 'grafico de lineas',
-    //   },
-    // };
-
-    // this.linechart.addSeries({
-    //   name: 'KKK',
-    //   data: this.collatzSerie
-    // });
 
     this.chartRef.addSeries({
       id: `${this.counter}`,
@@ -172,16 +163,21 @@ export class GraphContainerComponent {
       name: `#${this.counter}: ${this.collatzSerie[0]}`
     });
 
+    // Actualiza la lista de IDs y la emite
     this.seriesId.push(this.counter);
     this.outputList.emit(this.seriesId);
 
+    // Adición de la serie al historial (servicio)
     this.historyService.addSerie(this.collatzSerie);
 
+    // Reinicio de la serie actual
     this.collatzSerie = [];
 
+    // Aumento del contador
     this.counter++;
   }
 
+  // Remueve una serie mediante su Id
   removeSerie(deletedSerie: number){
     this.chartRef.get(`${deletedSerie}`).remove();
 
