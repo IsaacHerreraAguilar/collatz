@@ -19,6 +19,7 @@ export class HistoryComponent {
 
   // Trae el historial completo del servicio
   ngOnInit(): void {
+
     this.collatzList = this.historyService.getHistory();
 
     this.verifyGreatestSerie();

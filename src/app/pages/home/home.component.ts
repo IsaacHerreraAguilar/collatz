@@ -15,6 +15,8 @@ export class HomeComponent {
 
   homeDeletedSerie: number = 0;
 
+  clearSeries: boolean = false;
+
   // Recibe valor del input y verifica si es correcto
   receiveValue(value: string) {
     let tempValue = Number(value);
@@ -25,7 +27,6 @@ export class HomeComponent {
         icon: 'warning',
         confirmButtonText: 'Ok'
       })
-      //alert('Asegurese de insertar un número entero positivo');
     } else {
       this.correctNumber = Number(value);
     }
@@ -37,7 +38,11 @@ export class HomeComponent {
   }
 
   // Recibe Id de serie a borrar y la asigna para el uso de 'graph-container'
-  receiveId(value: number) {
+  receiveElement(value: number) {
     this.homeDeletedSerie = value;
+  }
+
+  clearSignal() {
+    this.clearSeries = !this.clearSeries;
   }
 }

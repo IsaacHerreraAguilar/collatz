@@ -1,5 +1,5 @@
-<div *ngFor="let item of seriesList">
+<div *ngFor="let item of seriesList; let i = index">
     <div id="{{item}}">
-        <app-active-element [element]="item" (removedId)="deleteSignalFather($event)"></app-active-element>
+        <app-active-element [id]="i+1" [element]="item" (removedElement)="deleteSignalFather($event)"></app-active-element>
     </div>
 </div>

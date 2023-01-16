@@ -4,10 +4,10 @@
     <div class="row">
         <div class="col-2 series-col">
             <p>Series Activas</p>
-            <app-element-list [seriesList]="collatzList" (removedId)="receiveId($event)"></app-element-list>
+            <app-element-list id="elementList" [seriesList]="collatzList" (removedElement)="receiveElement($event)"></app-element-list>
         </div>
         <div class="col-10">
-            <app-graph-container [newValue]="correctNumber" [deletedSerie]="homeDeletedSerie" (outputList)="receiveList($event)"></app-graph-container>
+            <app-graph-container [newValue]="correctNumber" [deletedSerie]="homeDeletedSerie" [clearSignal]="clearSeries" (outputList)="receiveList($event)"></app-graph-container>
             <div class="inputBox">
                 <label for="element-input">Insertar nueva serie</label>
                 <app-element-input id="element-input" (outputValue)="receiveValue($event)"></app-element-input>
@@ -17,5 +17,6 @@
 </div>
 
 <div class="d-grid gap-2 col-3 mx-auto">
+    <button id="clearButton" class="btn btn-lg btn-danger" (click)="clearSignal()">Borrar todas las series</button>
     <button id="historyButton" class="btn btn-lg btn-info" routerLink="/history">Historial</button>
 </div>

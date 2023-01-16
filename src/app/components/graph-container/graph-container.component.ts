@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges, OnInit, AfterViewInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import { Options } from 'highcharts';
 import { HistoryService } from 'src/app/services/history.service';
@@ -9,7 +9,7 @@ import { HistoryService } from 'src/app/services/history.service';
   styleUrls: ['./graph-container.component.css'],
 })
 
-export class GraphContainerComponent {
+export class GraphContainerComponent implements OnInit {
 
   // Entrada con el nuevo valor a graficar
   @Input() newValue: number = 0;
@@ -17,15 +17,22 @@ export class GraphContainerComponent {
   // Entrada del Id de la serie a borrar
   @Input() deletedSerie: number = 0;
 
-  // Salida de la lista de IDs de las series para el home
+  // Señal para saber si se debe limpiar el grafico
+  @Input() clearSignal: boolean = false;
+
+  // Salida de la lista de 1ros numeros de cada serie para el home
   @Output() outputList: EventEmitter<number[]> = new EventEmitter<number[]>();
 
-  // Lista con los id de las series
-  seriesId: number[] = [];
+  // Lista con los números iniciales de las series
+  seriesNumber: number[] = [];
 
   // Número actual para aplicar conjetura
   collatzValue: number = 0;
 
+  // Lista para almacenar las series activas
+  actualSeries: [number[]] = [[]];
+
+  // Booleano para saber si una conjetura va a entrar en un ciclo
   cicle = false;
 
   // Serie del número actual
@@ -33,44 +40,10 @@ export class GraphContainerComponent {
 
   Highcharts = Highcharts;
 
-  // Control de los Id de las series
-  counter: number = 1;
-
   chartRef: any;
   updateFlag: any;
 
-  // linechart: any = {
-  //   series: [
-  //     {
-  //       data: [1,2,3]
-  //     },
-  //     {
-  //       data: [10,50,5]
-  //     },
-  //   ],
-  //   chart: {
-  //     type: 'line',
-  //   },
-  //   title: {
-  //     text: 'grafico de lineas',
-  //   },
-  // };
-
-  // chart = new Highcharts.Chart({
-  //   chart: {
-  //     type: 'line'
-  //   },
-  //   title: {
-  //     text: 'GRAFICO'
-  //   },
-  //   series: [{
-  //     name: 'linea1',
-  //     type: 'line',
-  //     data: [1, 2, 3]
-  //   }]
-  // });
-
-  // Creación del graficador vacío
+  // Creación del graficador con una linea de prueba
   chartW: Options = {
     chart: {
       type: 'line'
@@ -78,7 +51,20 @@ export class GraphContainerComponent {
     title: {
       text: 'Pasos de la serie de Collatz de un número para llegar a 1 e iniciar un ciclo'
     },
-    series: [
+    credits: {
+      enabled: false
+    },
+    xAxis: {
+      allowDecimals: false
+    },
+    yAxis: {
+      allowDecimals: false
+    },
+    series: [{
+      name: 'test-line',
+      type: 'line',
+      data: [1,2,3]
+    }
     ]
   };
 
@@ -93,6 +79,40 @@ export class GraphContainerComponent {
     this.chartRef.series[0].update({
       type: 'column'
     });
+  }
+
+  ngOnInit(){
+
+    // Actualiza las series activas trayendolas del history service
+    this.actualSeries = this.historyService.getActiveSeries();
+
+    // Toma los 1ros números de cada serie y envia la lista al home
+    for(let i=1; i<this.actualSeries.length; i++){
+      this.seriesNumber.push(this.actualSeries[i][0]);
+    }
+
+    this.outputList.emit(this.seriesNumber);
+  }
+
+  ngAfterViewInit() {
+
+    // Si había series previamente, se elimina la serie de prueba
+    if(this.seriesNumber.length > 0){
+      this.chartRef.series[0].remove();
+    }
+
+    // Añade las series que estaban activas al graficador
+    if(this.chartRef){
+      for(let i=1; i<this.actualSeries.length; i++){
+
+        this.chartRef.addSeries({
+          id: `${this.actualSeries[i][0]}`,
+          type: 'line',
+          data: this.actualSeries[i],
+          name: `${this.actualSeries[i][0]}`
+        });
+      }
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -121,6 +141,15 @@ export class GraphContainerComponent {
       if(changes['deletedSerie'].previousValue != undefined){
         if(changes['deletedSerie'].currentValue != changes['deletedSerie'].previousValue){
           this.removeSerie(this.deletedSerie);
+        }
+      }
+    }
+
+    // Verifica si el valor de clearSignal cambió para así limpiar el gráfico
+    if(typeof changes['clearSignal'] != 'undefined'){
+      if(changes['clearSignal'].previousValue != undefined){
+        if(changes['clearSignal'].currentValue != changes['clearSignal'].previousValue){
+          this.clearGraph();
         }
       }
     }
@@ -156,31 +185,78 @@ export class GraphContainerComponent {
   // Añade una nueva serie al graficador
   genGraph() {
 
+    // Si no habían series previamente, se elimina la serie de prueba
+    if(this.seriesNumber.length == 0){
+      this.chartRef.series[0].remove();
+    }
+
     this.chartRef.addSeries({
-      id: `${this.counter}`,
+      id: `${this.collatzSerie[0]}`,
       type: 'line',
       data: this.collatzSerie,
-      name: `#${this.counter}: ${this.collatzSerie[0]}`
+      name: `${this.collatzSerie[0]}`
     });
 
-    // Actualiza la lista de IDs y la emite
-    this.seriesId.push(this.counter);
-    this.outputList.emit(this.seriesId);
+    // Actualiza la lista de numeros y la emite
+    this.seriesNumber.push(this.collatzSerie[0]);
+    this.outputList.emit(this.seriesNumber);
 
     // Adición de la serie al historial (servicio)
     this.historyService.addSerie(this.collatzSerie);
 
+    // Adición de la serie al servicio como serie activa
+    this.historyService.addActiveSerie(this.collatzSerie);
+
     // Reinicio de la serie actual
     this.collatzSerie = [];
-
-    // Aumento del contador
-    this.counter++;
   }
 
-  // Remueve una serie mediante su Id
-  removeSerie(deletedSerie: number){
+  // Remueve una serie mediante el 1er elemento de esta
+  removeSerie(deletedSerie: number) {
+
     this.chartRef.get(`${deletedSerie}`).remove();
 
-    document.getElementById(`${deletedSerie}`)?.remove();
+    let index = this.seriesNumber.indexOf(deletedSerie);
+    this.seriesNumber.splice(index, 1);
+    this.outputList.emit(this.seriesNumber);
+
+    // Elimina la serie activa del history service
+    this.historyService.deleteActiveSerie(this.actualSeries[index+1]);
+
+    this.actualSeries.splice(index, 1);
+
+    // Si el grafico se queda sin series se añade la serie de prueba
+    if(this.seriesNumber.length == 0){
+      this.chartRef.addSeries({
+        type: 'line',
+        data: [1,2,3],
+        name: 'test-line'
+      });
+    }
   }
+
+  // Remueve todas las series del gráfico
+  clearGraph() {
+
+    while(this.chartRef.series.length){
+      this.chartRef.series[0].remove();
+    }
+
+    // Limpia las lista y envia la lista de números al home
+    this.seriesNumber = [];
+
+    this.actualSeries = [[]];
+
+    this.historyService.clearActiveSeries();
+
+    this.outputList.emit(this.seriesNumber);
+
+    // Se vuelve a añadir la serie de prueba
+    this.chartRef.addSeries({
+      type: 'line',
+      data: [1,2,3],
+      name: 'test-line'
+    });
+  }
+
 }
